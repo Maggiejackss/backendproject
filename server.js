@@ -11,8 +11,24 @@ server.set('view engine', 'html');
 server.use(express.static(__dirname + '/public'));
 
 server.get('/', (req, res) => {
-  res.render('index');
-})
+  res.render('index', {
+    partials: {
+      footer: 'partials/footer',
+      header: 'partials/header',
+      main: 'partials/mainHTMLs/landing'
+    }
+  });
+});
+
+server.get('/login', (req, res) => {
+  res.render('index', {
+    partials: {
+      footer: 'partials/footer',
+      header: 'partials/header',
+      main: 'partials/mainHTMLs/login'
+    }
+  });
+});
 
 const PORT = process.env.PORT || 8080;
 
