@@ -1,12 +1,13 @@
+require('dotenv').config();
+
 const express = require('express');
 
 const server = express();
+
+const PORT = process.env.PORT || 8080;
 
 server.get('/heartbeat', (req, res) => {
     res.json({message: 'heartbeat'});
 })
 
-server.listen(8080, () => {
-    console.log('the server is running at PORT 8080');
-})
-
+server.listen(PORT, () => console.log (`this server is running at PORT ${PORT}`));
