@@ -8,6 +8,8 @@ server.engine('html', es6Renderer);
 server.set('views', 'views');
 server.set('view engine', 'html');
 
+server.use(express.static(__dirname + '/public'));
+
 server.get('/', (req, res) => {
   res.render('index');
 })
