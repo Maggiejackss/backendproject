@@ -2,6 +2,7 @@ require('dotenv').config();
 const es6Renderer = require('express-es6-template-engine');
 const { setMainView } = require('./utils');
 const express = require('express');
+const navs = require('./directory/navs.json');
 
 const server = express();
 
@@ -13,12 +14,14 @@ server.use(express.static(__dirname + '/public'));
 
 server.get('/', (req, res) => {
   res.render('index', {
+    locals: { navs },
     partials: setMainView('landing')
   });
 });
 
 server.get('/login', (req, res) => {
   res.render('index', {
+    locals: { navs },
     partials: setMainView('login')
   });
 });

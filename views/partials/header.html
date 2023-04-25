@@ -1,1 +1,10 @@
-<header class="y-wrap">header</header>
+<header>
+  <nav class="y-wrap navs">
+    ${
+      navs.map(nav => `
+        <a href="${nav.href}">${nav.name}</a>
+      `).join('')
+    }
+  </nav>
+
+</header>

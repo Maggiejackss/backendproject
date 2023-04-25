@@ -14,6 +14,7 @@ const handleSubmit = (e) => {
   const data = new FormData(e.target);
   const stringified = stringifyFormData(data);
   console.log(stringified);
+  renderForm();
 };
 
 const renderForm = () => {
