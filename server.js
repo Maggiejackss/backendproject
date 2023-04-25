@@ -1,6 +1,6 @@
 require('dotenv').config();
 const es6Renderer = require('express-es6-template-engine');
-const { setMainView } = require('./utils');
+const { setMainView, setNavs } = require('./utils');
 const express = require('express');
 const navs = require('./directory/navs.json');
 
@@ -14,15 +14,52 @@ server.use(express.static(__dirname + '/public'));
 
 server.get('/', (req, res) => {
   res.render('index', {
-    locals: { navs },
+    locals: setNavs(req.url, navs),
     partials: setMainView('landing')
+  });
+});
+
+server.get('/about', (req, res) => {
+  console.log('pota', req.url);
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('about')
   });
 });
 
 server.get('/login', (req, res) => {
   res.render('index', {
-    locals: { navs },
+    locals: setNavs(req.url, navs),
     partials: setMainView('login')
+  });
+});
+
+server.get('/gallery', (req, res) => {
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('gallery')
+  });
+});
+
+server.get('/profile', (req, res) => {
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('profile')
+  });
+});
+
+server.get('/logout', (req, res) => {
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('logout')
+  });
+});
+
+
+server.get('/contact-us', (req, res) => {
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('contact-us')
   });
 });
 
