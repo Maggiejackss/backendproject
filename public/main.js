@@ -1,4 +1,5 @@
 const form = document.getElementById('form');
+const credsContainer = form.querySelector('#credentials-container');
 
 function stringifyFormData(fd) {
   const data = {};
@@ -15,5 +16,18 @@ const handleSubmit = (e) => {
   console.log(stringified);
 };
 
+const renderForm = () => {
+  const html = `
+    <div class="input-field">
+        <input type="text" name="username" id="username" placeholder="Enter Username">
+    </div>
+    <div class="input-field">
+        <input type="password" name="password" id="password" placeholder="Enter Password">
+    </div>
+    <input type="submit" value="LogIn">
+  `;
+  credsContainer.innerHTML = html;
+}
 
+renderForm();
 form.addEventListener('submit', handleSubmit);
