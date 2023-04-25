@@ -46,7 +46,6 @@ server.get('/login', (req, res) => {
 
 server.post('/login', (req, res) => {
   const { username, password } = req.body;
-  console.log(validCreds.username, username, validCreds.password, password)
   if (password === validCreds.password && username === validCreds.username) {
     authStatus.isAuthenticated = true;
   } else {
