@@ -1,3 +1,5 @@
+// const { application } = require("express");
+
 const form = document.getElementById('form');
 const credsContainer = form.querySelector('#credentials-container');
 
@@ -9,12 +11,13 @@ function stringifyFormData(fd) {
   return JSON.stringify(data, null, 4);
 }
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   const data = new FormData(e.target);
   const stringified = stringifyFormData(data);
-  console.log(stringified);
+  const response = await doLogin(stringified);
   renderForm();
+  console.log(`The user is logged in: ${response.isAuthenticated}`);
 };
 
 const renderForm = () => {
@@ -28,6 +31,18 @@ const renderForm = () => {
     <input type="submit" value="LogIn">
   `;
   credsContainer.innerHTML = html;
+}
+
+const doLogin = async (body) => {
+  const data = await fetch('/login', {
+    body,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    method: 'POST'
+  });
+  const response = await data.json();
+  return response;
 }
 
 renderForm();
