@@ -61,7 +61,7 @@ server.post('/login', (req, res) => {
   if (password === validCreds.password && username === validCreds.username) {
     req.session.userId = username;
     afterLogin.isAuthenticated = true;
-    afterLogin.redirectTo = '/profile';
+    afterLogin.redirectTo = './profile';
   }
   res.json(afterLogin);
 })
