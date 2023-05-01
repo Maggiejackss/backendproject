@@ -3,6 +3,18 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const es6Renderer = require('express-es6-template-engine');
+const pgp = require('pg-promise')();
+
+const cn = {
+  host: 'localhost',
+  port: 5432,
+  database: 'reviews',
+  user: 'postgres',
+  password: 'grady',
+  allowedExitOnIdle: true,
+}
+
+const db = pgp(cn);
 
 const { checkAuth } = require('./middleware');
 const { setMainView, setNavs } = require('./utils');
