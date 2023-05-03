@@ -37,11 +37,6 @@ server.use(sessions({
   resave: false
 }));
 
-const validCreds = {
-  username: 'dave',
-  password: '1234'
-}
-
 server.get('/', (req, res) => {
   res.render('index', {
     locals: setNavs(req.url, navs),
