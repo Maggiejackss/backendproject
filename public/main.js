@@ -18,6 +18,7 @@ const renderForm = () => {
   credsContainer.innerHTML = html;
 }
 
+
 const handleSubmit = async (e) => {
   e.preventDefault();
   const data = new FormData(e.target);
@@ -78,4 +79,19 @@ const callApi = async () => {
 }
 
 
+
 button.addEventListener('click', callApi);
+
+const addCookie = (name, value, maxAge) => {
+  const cookie = `${name}=${value}; max-age=${maxAge}`;
+  document.cookie = cookie;
+};
+const handleLogin = async (e) => {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  const stringified = stringifyFormData(data);
+  const response = await doLogin(stringified);
+  addCookie('loggedIn', 'true', 900); // set a cookie with the name 'loggedIn', value 'true', and max age of 900 seconds (15 minutes)
+  location.href = response.redirectTo;
+  console.log(`The user is logged in: ${response.isAuthenticated}`);
+};
