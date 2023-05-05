@@ -9,12 +9,40 @@ const cn = {
   host: 'localhost',
   port: 5432,
   database: 'reviews',
-  user: 'postgres',
-  password: 'grady',
+  user: 'jordancouch',
+  password: '',
   allowedExitOnIdle: true,
 }
 
 const db = pgp(cn);
+
+// db.query('SELECT * FROM users', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+// // Query the userreviews table
+// db.query('SELECT * FROM userreviews', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+// // Query the movieinfo table
+// db.query('SELECT * FROM movieinfo', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+
 
 const { checkAuth } = require('./middleware');
 const { setMainView, setNavs } = require('./utils');
@@ -59,13 +87,18 @@ server.get('/login', (req, res) => {
   });
 });
 
-server.post('/login', (req, res) => {
+server.post('/login', async (req, res) => {
   const afterLogin = {
     isAuthenticated: false,
     redirectTo: './login'
   };
   const { username, password } = req.body;
-  if (password === validCreds.password && username === validCreds.username) {
+  console.log(password);
+  let test = await db.query('SELECT * FROM users');
+  console.log(test);
+  let result = await db.query(`SELECT password FROM users WHERE username = '${username}'`);
+  console.log('newresult', result);
+  if (password === result[0].password) {
     req.session.userId = username;
     afterLogin.isAuthenticated = true;
     afterLogin.redirectTo = './profile';
@@ -94,6 +127,12 @@ server.get('/logout', (req, res) => {
     partials: setMainView('logout')
   });
 });
+server.use(sessions({
+  secret: process.env.SECRET,
+  saveUninitialized: true,
+  cookie: { maxAge: 30000 },
+  resave: false
+}));
 
 
 server.get('/contact-us', (req, res) => {
