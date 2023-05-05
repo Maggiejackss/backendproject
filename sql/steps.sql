@@ -3,7 +3,7 @@ CREATE DATABASE reviews;
 CREATE TABLE users (
     username VARCHAR(50),
     password VARCHAR(50),
-    datecreated DATE,
+    datecreated DATE
 );
 CREATE TABLE userreviews (
     movietitle VARCHAR(100),
@@ -11,6 +11,7 @@ CREATE TABLE userreviews (
     datereviewed DATE,
     reviewjson JSON
 );
+
 CREATE TABLE movieinfo (
     movietitle VARCHAR(50),
     yearreleased INTEGER,
