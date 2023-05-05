@@ -4,6 +4,9 @@ const cookieParser = require('cookie-parser');
 const sessions = require('express-session');
 const es6Renderer = require('express-es6-template-engine');
 const pgp = require('pg-promise')();
+const cors = require('cors');
+let date = new Date().toISOString();
+
 
 const cn = {
   host: 'localhost',
@@ -21,6 +24,7 @@ const { setMainView, setNavs } = require('./utils');
 const express = require('express');
 const navs = require('./directory/navs.json');
 
+
 const server = express();
 
 server.engine('html', es6Renderer);
@@ -36,6 +40,10 @@ server.use(sessions({
   cookie: { maxAge: 30000 },
   resave: false
 }));
+server.use(cors({
+  origin: ['http://127.0.0.1:5500']
+}));
+
 
 server.get('/', (req, res) => {
   res.render('index', {
@@ -59,13 +67,15 @@ server.get('/login', (req, res) => {
   });
 });
 
-server.post('/login', (req, res) => {
+server.post('/login', async (req, res) => {
   const afterLogin = {
     isAuthenticated: false,
     redirectTo: './login'
   };
   const { username, password } = req.body;
-  if (password === validCreds.password && username === validCreds.username) {
+  console.log(username);
+  let result = await db.query(`SELECT password FROM users WHERE username = '${username}'`);
+  if (password === result[0].password) {
     req.session.userId = username;
     afterLogin.isAuthenticated = true;
     afterLogin.redirectTo = './profile';
@@ -87,6 +97,35 @@ server.get('/profile', checkAuth, (req, res) => {
     partials: setMainView('profile')
   });
 });
+
+server.get('/signup', (req, res) => {
+  res.render('index', {
+    locals: setNavs(req.url, navs),
+    partials: setMainView('signup')
+  });
+});
+
+server.post('/signup', async (req, res) => {
+  console.log('hello');
+  const afterSignup = {
+    isRegistered: false,
+    redirectTo: './signup'
+  }
+  const {username, password, email} = req.body;
+  console.log({username, password, email});
+  let result = await db.query(`SELECT username FROM users WHERE username = '${username}'`);
+  console.log(result);
+  if (result.length > 0) {
+    console.log('error: user already exists');
+  } else {
+    await db.many(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
+    console.log('running else');
+    req.session.userId = username;
+    afterSignup.isRegistered = true;
+    afterSignup.redirectTo = './profile';
+  }
+
+})
 
 server.get('/logout', (req, res) => {
   res.render('index', {
