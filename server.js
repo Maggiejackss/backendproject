@@ -105,6 +105,10 @@ server.get('/signup', (req, res) => {
   });
 });
 
+/* This code block is handling a POST request to the '/signup' endpoint. It is checking if the username
+already exists in the database, and if not, it is inserting the new user's information into the
+database and setting the session's userId to the new user's username. It then sends a JSON response
+indicating whether the registration was successful or not, and where to redirect the user. */
 server.post('/signup', async (req, res) => {
   console.log('hello');
   const afterSignup = {
@@ -113,19 +117,20 @@ server.post('/signup', async (req, res) => {
   }
   const {username, password, email} = req.body;
   console.log({username, password, email});
-  let result = await db.query(`SELECT username FROM users WHERE username = '${username}'`);
-  console.log(result);
-  if (result.length > 0) {
+  let result = await db.manyOrNone(`SELECT username FROM users WHERE username = '${username}'`);
+  console.log(result.length);
+  if (result && result.length > 0) {
     console.log('error: user already exists');
+    res.json('error: user already exists');
   } else {
-    await db.many(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
+    await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
     console.log('running else');
     req.session.userId = username;
     afterSignup.isRegistered = true;
     afterSignup.redirectTo = './profile';
+    res.json(afterSignup);
   }
-
-})
+}) 
 
 server.get('/logout', (req, res) => {
   res.render('index', {
