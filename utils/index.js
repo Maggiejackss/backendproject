@@ -6,15 +6,21 @@ const setMainView = (view) => {
   }
 }
 
-const setNavs = (currentHref, navs) => {
+const setNavs = (currentHref, navs, isAuthenticated) => {
   const _navs = navs.map(nav => {
     nav.className = '';
     if (nav.href === currentHref) {
       nav.className = 'active';
     }
     return nav;
-  });
-  return {navs};
+  }).filter(nav => {
+    if (!isAuthenticated) {
+      return !nav.isPrivate;
+    } else {
+      return nav.isPrivate || nav.isPrivate === undefined;
+    }
+  })
+  return {navs: _navs};
 }
 
 module.exports = { setMainView, setNavs };

@@ -47,7 +47,7 @@ server.use(cors({
 
 server.get('/', (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('landing')
   });
 });
@@ -55,14 +55,14 @@ server.get('/', (req, res) => {
 server.get('/about', (req, res) => {
   console.log('pota', req.url);
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('about')
   });
 });
 
 server.get('/login', (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('login')
   });
 });
@@ -86,21 +86,21 @@ server.post('/login', async (req, res) => {
 
 server.get('/gallery', (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('gallery')
   });
 });
 
 server.get('/profile', checkAuth, (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('profile')
   });
 });
 
 server.get('/signup', (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('signup')
   });
 });
@@ -112,7 +112,7 @@ indicating whether the registration was successful or not, and where to redirect
 server.post('/signup', async (req, res) => {
   console.log('hello');
   const afterSignup = {
-    isRegistered: false,
+    isAuthenticated: false,
     redirectTo: './signup'
   }
   const {username, password, email} = req.body;
@@ -126,23 +126,21 @@ server.post('/signup', async (req, res) => {
     await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
     console.log('running else');
     req.session.userId = username;
-    afterSignup.isRegistered = true;
+    afterSignup.isAuthenticated = true;
     afterSignup.redirectTo = './profile';
-    res.json(afterSignup);
   }
+  res.json(afterSignup);
 }) 
 
 server.get('/logout', (req, res) => {
-  res.render('index', {
-    locals: setNavs(req.url, navs),
-    partials: setMainView('logout')
-  });
+  req.session.destroy();
+  res.redirect('/');
 });
 
 
 server.get('/contact-us', (req, res) => {
   res.render('index', {
-    locals: setNavs(req.url, navs),
+    locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('contact-us')
   });
 });
