@@ -11,6 +11,7 @@ CREATE TABLE userreviews (
     datereviewed DATE,
     reviewjson JSON
 );
+
 CREATE TABLE movieinfo (
     movietitle VARCHAR(50),
     yearreleased INTEGER,

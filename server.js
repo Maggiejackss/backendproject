@@ -12,12 +12,40 @@ const cn = {
   host: 'localhost',
   port: 5432,
   database: 'reviews',
-  user: 'postgres',
-  password: 'grady',
+  user: 'jordancouch',
+  password: '',
   allowedExitOnIdle: true,
 }
 
 const db = pgp(cn);
+
+// db.query('SELECT * FROM users', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+// // Query the userreviews table
+// db.query('SELECT * FROM userreviews', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+// // Query the movieinfo table
+// db.query('SELECT * FROM movieinfo', (err, res) => {
+//   if (err) {
+//     console.error(err);
+//     return;
+//   }
+//   console.log(res.rows);
+// });
+
+
 
 const { checkAuth } = require('./middleware');
 const { setMainView, setNavs } = require('./utils');
@@ -103,6 +131,38 @@ server.get('/signup', (req, res) => {
     locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('signup')
   });
+});
+
+/* This code block is handling a POST request to the '/signup' endpoint. It is checking if the username
+already exists in the database, and if not, it is inserting the new user's information into the
+database and setting the session's userId to the new user's username. It then sends a JSON response
+indicating whether the registration was successful or not, and where to redirect the user. */
+server.post('/signup', async (req, res) => {
+  console.log('hello');
+  const afterSignup = {
+    isAuthenticated: false,
+    redirectTo: './signup'
+  }
+  const {username, password, email} = req.body;
+  console.log({username, password, email});
+  let result = await db.manyOrNone(`SELECT username FROM users WHERE username = '${username}'`);
+  console.log(result.length);
+  if (result && result.length > 0) {
+    console.log('error: user already exists');
+    res.json('error: user already exists');
+  } else {
+    await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
+    console.log('running else');
+    req.session.userId = username;
+    afterSignup.isAuthenticated = true;
+    afterSignup.redirectTo = './profile';
+  }
+  res.json(afterSignup);
+}) 
+
+server.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
 });
 
 /* This code block is handling a POST request to the '/signup' endpoint. It is checking if the username
