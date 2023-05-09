@@ -1,9 +1,9 @@
 // const { application } = require("express");
-
 let button = document.getElementById('test');
 const form = document.getElementById('form');
+let body = document.getElementById('body');
 
-const renderForm = () => {
+const renderLogin = () => {
   const credsContainer = form.querySelector('#credentials-container');
   const html = `
     <div class="input-field">
@@ -28,6 +28,21 @@ const addCookie = (name, value, maxAge) => {
   const cookie = `${name}=${value}; max-age=${maxAge}`;
   document.cookie = cookie;
 };
+
+const pullRecommended = async () => {
+    const response = await fetch('https://s3.amazonaws.com/popular-movies/movies.json');
+    const data = await response.json();
+    return data;
+  }
+
+const checkMain = async () => {
+  let mainPage = document.querySelector('#apiDisplay');
+  if (mainPage) {
+    pullRecommended();
+    
+  }
+}
+
 
 const renderSignUp = () => {
   const credsContainer = form.querySelector('#credentials-container');
@@ -75,22 +90,12 @@ const signUpSubmit = async (e) => {
   console.log(`The user is logged in: ${response.isAuthenticated}`);
 };
 
-const signUpSubmit = async (e) => {
-  console.log('in signupsubmit');
-  e.preventDefault();
-  const data = new FormData(e.target);
-  const stringified = stringifyFormData(data);
-  const response = await doSignUp(stringified);
-  location.href = response.redirectTo;
-  console.log(`The user is logged in: ${response.isAuthenticated}`);
-};
-
 
 const credsCheck = () => {
   if (location.href != 'http://localhost:8080/login') {
     return 
   } else {
-    renderForm();
+    renderLogin();
     addCookie('loggedIn', 'true', 1800); 
     form.addEventListener('submit', loginSubmit);
   }
@@ -144,24 +149,23 @@ const doSignUp = async (body) => {
   return response;
 }
 
-const randomNumbers = () => {
-  let titleCode = 'tt1';
-  let digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  for (let i = 1; i <= 6; i++) {
-    let randomNumber = digits[Math.floor(Math.random() * digits.length)];
-    titleCode += randomNumber;
-  }
-  return titleCode;
-}
+// const randomNumbers = () => {
+//   let titleCode = 'tt1';
+//   let digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+//   for (let i = 1; i <= 6; i++) {
+//     let randomNumber = digits[Math.floor(Math.random() * digits.length)];
+//     titleCode += randomNumber;
+//   }
+//   return titleCode;
+// }
 
 const callApi = async () => {
-  const titleCode = randomNumbers();
-  console.log(titleCode);
-  const response = await fetch(`http://www.omdbapi.com/?i=${titleCode}&plot=full&apikey=e74ffb63`);
+  console.log(title);
+  const response = await fetch(`/search/?t=${title}`);
   const data = await response.json();
   console.log(data);
+  // if (data.genre != )
 }
 
 
 
-button.addEventListener('click', callApi);

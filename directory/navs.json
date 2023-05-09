@@ -29,5 +29,10 @@
     "href": "/logout",
     "isPrivate": true,
     "name": "Logout"
+  },
+  {
+    "href": "/signup",
+    "isPrivate": false,
+    "name": "Signup"
   }
 ]

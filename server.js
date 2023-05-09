@@ -5,6 +5,7 @@ const sessions = require('express-session');
 const es6Renderer = require('express-es6-template-engine');
 const pgp = require('pg-promise')();
 const cors = require('cors');
+const APIKEY = process.env.APIKEY;
 let date = new Date().toISOString();
 
 
@@ -12,8 +13,8 @@ const cn = {
   host: 'localhost',
   port: 5432,
   database: 'reviews',
-  user: 'jordancouch',
-  password: '',
+  user: 'postgres',
+  password: 'grady',
   allowedExitOnIdle: true,
 }
 
@@ -88,6 +89,25 @@ server.get('/about', (req, res) => {
   });
 });
 
+const randomNumbers = () => {
+  let titleCode = 'tt1';
+  let digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  for (let i = 1; i <= 6; i++) {
+    let randomNumber = digits[Math.floor(Math.random() * digits.length)];
+    titleCode += randomNumber;
+  }
+  return titleCode;
+}
+
+server.get('/search', async (req, res) => {
+  const titleCode = randomNumbers();
+  console.log(req.query);
+  const { i } = req.query;
+  const data = await fetch(`http://www.omdbapi.com/?i=${titleCode}&plot=full&apikey=${APIKEY}`);
+  const response = await data.json();
+  res.json(response);
+})
+
 server.get('/login', (req, res) => {
   res.render('index', {
     locals: setNavs(req.url, navs, !!req.session.userId),
@@ -131,38 +151,6 @@ server.get('/signup', (req, res) => {
     locals: setNavs(req.url, navs, !!req.session.userId),
     partials: setMainView('signup')
   });
-});
-
-/* This code block is handling a POST request to the '/signup' endpoint. It is checking if the username
-already exists in the database, and if not, it is inserting the new user's information into the
-database and setting the session's userId to the new user's username. It then sends a JSON response
-indicating whether the registration was successful or not, and where to redirect the user. */
-server.post('/signup', async (req, res) => {
-  console.log('hello');
-  const afterSignup = {
-    isAuthenticated: false,
-    redirectTo: './signup'
-  }
-  const {username, password, email} = req.body;
-  console.log({username, password, email});
-  let result = await db.manyOrNone(`SELECT username FROM users WHERE username = '${username}'`);
-  console.log(result.length);
-  if (result && result.length > 0) {
-    console.log('error: user already exists');
-    res.json('error: user already exists');
-  } else {
-    await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
-    console.log('running else');
-    req.session.userId = username;
-    afterSignup.isAuthenticated = true;
-    afterSignup.redirectTo = './profile';
-  }
-  res.json(afterSignup);
-}) 
-
-server.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
 });
 
 /* This code block is handling a POST request to the '/signup' endpoint. It is checking if the username
