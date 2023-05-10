@@ -1,25 +1,32 @@
 CREATE DATABASE reviews;
 \c reviews;
 CREATE TABLE users (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(50),
-    password VARCHAR(50),
-    datecreated DATE
+    password TEXT,
+    datecreated DATE,
+    email VARCHAR(50)
+   
 );
 CREATE TABLE userreviews (
+    id int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    userid INT REFERENCES users (id),
     movietitle VARCHAR(100),
     stars INTEGER,
     datereviewed DATE,
-    reviewjson JSON
+    reviewjson JSON,
+    FOREIGN KEY (userid) REFERENCES users(id) 
+    FOREIGN KEY (movieid) REFERENCES movieinfo(id)
 );
 
 CREATE TABLE movieinfo (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    movieid INTEGER,
     movietitle VARCHAR(50),
     yearreleased INTEGER,
     totalstars INTEGER,
-    userrevjson JSON
+    userrevjson JSON,
 );
-INSERT INTO users (username, password, datecreated)
-VALUES ('johndoe', 'mypassword', '2023-04-30');
 
 
 INSERT INTO userreviews (movietitle, stars, datereviewed, reviewjson)
