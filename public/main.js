@@ -26,17 +26,10 @@ const renderLogin = () => {
 
 function renderModal(data) {
   const div = document.createElement('div');
-  const img = document.createElement('img');
-  const titleDiv = document.createElement('div');
-  titleDiv.innerText = `${data.Title}`;
-  console.log(data);
-  img.src = `${data.Poster}`;
-  img.className = 'poster';
   div.className = 'modal y-sticky';
   div.id = 'temp';
-  div.append(img);
-  div.append(titleDiv);
   body.append(div);
+  modalForm(data);
   body.className = 'no-scroll';
   const cancelBtn = document.createElement('button');
   cancelBtn.innerText = 'cancel'
@@ -56,6 +49,36 @@ function handleCancel() {
   body.className = '';
 }
 
+
+const modalForm = (data) => {
+  const modal = document.querySelector('#temp');
+  if (modal) {
+    const formDiv = document.createElement('div');
+    const img = document.createElement('img');
+    const titleDiv = document.createElement('div');
+    const yearDiv = document.createElement('div');
+    yearDiv.innerText = `${data.Year}`;
+    titleDiv.innerText = `${data.Title}`;
+    console.log(data);
+    img.src = `${data.Poster}`;
+    img.className = 'poster';
+    const modalFormTemplate = `
+      <div class="input-field">
+          <input type="text" name="Review" id="Review" placeholder="Leave this movie a review!">
+      </div>
+      <div class="input-field">
+          <input type="text" name="stars" id="stars" placeholder="Stars 1-5">
+      </div>
+      <input type="submit" value="Submit Review">
+    `;
+    modal.addEventListener('submit', reviewSubmit);
+    formDiv.innerHTML = modalFormTemplate;
+    modal.append(img);
+    modal.append(titleDiv);
+    modal.append(yearDiv);
+    modal.append(formDiv);
+  }
+}
 /**
  * The function adds a cookie with a given name, value, and maximum age to the document's cookies.
  * @param name - The name of the cookie that you want to set. It is a string value.
@@ -120,7 +143,6 @@ const createFilmDisplay = (array) => {
   let apiDisplay = document.querySelector('#apiDisplay');
   apiDisplay.innerHTML = '';
   let currentPoster = array[position];
-  console.log(currentPoster);
   apiDisplay.append(currentPoster);
 }
 
@@ -182,6 +204,14 @@ const renderSignUp = () => {
  */
 
 
+const reviewSubmit = async (e) => {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  const stringified = stringifyFormData(data);
+  const response = await doReview(stringified);
+  location.href = response.redirectTo;
+}
+
 const loginSubmit = async (e) => {
   e.preventDefault();
   const data = new FormData(e.target);
@@ -224,6 +254,14 @@ const signCheck = () => {
 }
 signCheck();
 
+/**
+ * The function converts form data into a JSON string.
+ * @param fd - fd is a FormData object, which is a built-in JavaScript object that allows you to easily
+ * construct a set of key/value pairs representing form fields and their values. It is commonly used to
+ * send form data to a server via an HTTP request.
+ * @returns The function `stringifyFormData` returns a JSON string representation of the data in the
+ * provided `FormData` object, with a 4-space indentation.
+ */
 function stringifyFormData(fd) {
   const data = {};
   for (let key of fd.keys()) {
@@ -261,6 +299,17 @@ const doSignUp = async (body) => {
   return response;
 }
 
+const doReview = async (body) => {
+  const data = await fetch('/', {
+    body,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    method: 'POST'
+  });
+  const response = await data.json();
+  return response;
+}
 // const randomNumbers = () => {
 //   let titleCode = 'tt1';
 //   let digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];

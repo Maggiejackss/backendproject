@@ -101,17 +101,14 @@ const randomNumbers = () => {
 }
 
 server.get('/search', async (req, res) => {
-  console.log(req.query);
   const {title, imdb_id} = req.headers;
   const data = await fetch(`http://www.omdbapi.com/?t=${title}&plot=full&apikey=${APIKEY}`);
   const response = await data.json();
   if (response.Response != 'False'){
-    console.log(response);
     res.json(response);
   } else {
     const data = await fetch(`http://www.omdbapi.com/?i=${imdb_id}&plot=full&apikey=${APIKEY}`);
     const response = await data.json();
-    console.log(response);
     res.json(response);
   }
 })
@@ -194,6 +191,11 @@ server.post('/signup', async (req, res) => {
   }
   res.json(afterSignup);
 }) 
+
+server.post('/', async (req, res) => {
+  const {movietitle, reviewjson, stars, yearreleased} = req.body;
+  console.log(movietitle);
+})
 
 server.get('/logout', (req, res) => {
   req.session.destroy();

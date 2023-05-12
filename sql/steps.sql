@@ -22,7 +22,7 @@ CREATE TABLE userreviews (
     datereviewed DATE,
     reviewjson JSON,
     FOREIGN KEY (userid) REFERENCES users(id), 
-    FOREIGN KEY (movieid) REFERENCES movieinfo(id)
+    FOREIGN KEY (id) REFERENCES movieinfo(id)
 );
 
 
