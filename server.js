@@ -5,6 +5,7 @@ const sessions = require('express-session');
 const es6Renderer = require('express-es6-template-engine');
 const pgp = require('pg-promise')();
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const APIKEY = process.env.APIKEY;
 let date = new Date().toISOString();
 
@@ -100,12 +101,16 @@ const randomNumbers = () => {
 }
 
 server.get('/search', async (req, res) => {
-  const titleCode = randomNumbers();
-  console.log(req.query);
-  const { i } = req.query;
-  const data = await fetch(`http://www.omdbapi.com/?i=${titleCode}&plot=full&apikey=${APIKEY}`);
+  const {title, imdb_id} = req.headers;
+  const data = await fetch(`http://www.omdbapi.com/?t=${title}&plot=full&apikey=${APIKEY}`);
   const response = await data.json();
-  res.json(response);
+  if (response.Response != 'False'){
+    res.json(response);
+  } else {
+    const data = await fetch(`http://www.omdbapi.com/?i=${imdb_id}&plot=full&apikey=${APIKEY}`);
+    const response = await data.json();
+    res.json(response);
+  }
 })
 
 server.get('/login', (req, res) => {
@@ -123,10 +128,15 @@ server.post('/login', async (req, res) => {
   const { username, password } = req.body;
   console.log(username);
   let result = await db.query(`SELECT password FROM users WHERE username = '${username}'`);
-  if (password === result[0].password) {
+  console.log(result);
+  console.log(typeof password);
+  const isMatch = await bcrypt.compare(password, result[0].password);
+  if (isMatch) {
     req.session.userId = username;
     afterLogin.isAuthenticated = true;
     afterLogin.redirectTo = './profile';
+  } else {
+    console.log('user does not exist');
   }
   res.json(afterLogin);
 })
@@ -171,7 +181,9 @@ server.post('/signup', async (req, res) => {
     console.log('error: user already exists');
     res.json('error: user already exists');
   } else {
-    await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${password}', '${date}', '${email}')`);
+    const salt = await bcrypt.genSalt(10);
+    const hashedpassword = await bcrypt.hash(password, salt);
+    await db.query(`INSERT INTO users (username, password, datecreated, email) VALUES ('${username}', '${hashedpassword}', '${date}', '${email}')`);
     console.log('running else');
     req.session.userId = username;
     afterSignup.isAuthenticated = true;
@@ -179,6 +191,11 @@ server.post('/signup', async (req, res) => {
   }
   res.json(afterSignup);
 }) 
+
+server.post('/', async (req, res) => {
+  const {movietitle, reviewjson, stars, yearreleased} = req.body;
+  console.log(movietitle);
+})
 
 server.get('/logout', (req, res) => {
   req.session.destroy();
