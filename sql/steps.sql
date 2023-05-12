@@ -6,7 +6,6 @@ CREATE TABLE users (
     password TEXT,
     datecreated DATE,
     email VARCHAR(50)
-   
 );
 CREATE TABLE movieinfo (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -17,7 +16,7 @@ CREATE TABLE movieinfo (
 );
 CREATE TABLE userreviews (
     id int GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    userid INT REFERENCES users (id),
+    userid INT,
     movietitle VARCHAR(100),
     stars INTEGER,
     datereviewed DATE,
